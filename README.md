@@ -153,8 +153,8 @@ Add multiple room support
 # Author
 Harsha G
 Learning:
-Embedded Systems
-IoT Systems
-Python Flask
-ESP32 Development
+Embedded Systems|
+IoT Systems|
+Python Flask|
+ESP32 Development|
 Backend Development
