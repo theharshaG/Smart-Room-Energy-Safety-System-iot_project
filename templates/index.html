@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Smart Room Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        body {
+            background: #111;
+            color: white;
+            text-align: center;
+            font-family: Arial;
+        }
+
+        h1 {
+            color: cyan;
+        }
+
+        .box {
+            border: 1px solid white;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        canvas {
+            width: 80% !important;
+            max-width: 700px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>🏠 Smart Room Energy & Safety System</h1>
+
+<div class="box">
+
+    <h2 id="room">ROOM STATUS</h2>
+
+    <h2 id="motion">MOTION STATUS</h2>
+
+    <h2 id="entry">ENTRY STATUS</h2>
+
+    <h2 id="temp">TEMP</h2>
+
+    <h2 id="hum">HUMIDITY</h2>
+
+</div>
+
+<canvas id="chart"></canvas>
+
+<script>
+
+let chart;
+
+function loadData() {
+
+    fetch('/data')
+    .then(res => res.json())
+    .then(data => {
+
+        let labels = [];
+        let temps = [];
+
+        data.forEach((item, index) => {
+
+            labels.push(index + 1);
+
+            temps.push(item.temp);
+        });
+
+        let last = data[data.length - 1];
+
+        if (last) {
+
+            // ROOM STATUS
+            if (last.pir == 1) {
+
+                document.getElementById('room').innerText =
+                "ROOM OCCUPIED";
+
+                document.getElementById('motion').innerText =
+                "MOTION DETECTED";
+            }
+
+            else {
+
+                document.getElementById('room').innerText =
+                "ROOM EMPTY";
+
+                document.getElementById('motion').innerText =
+                "NO MOTION";
+            }
+
+            // ENTRY
+            if (last.ir == 0) {
+
+                document.getElementById('entry').innerText =
+                "ENTRY DETECTED";
+            }
+
+            else {
+
+                document.getElementById('entry').innerText =
+                "NO ENTRY";
+            }
+
+            // TEMP + HUMIDITY
+            document.getElementById('temp').innerText =
+            "TEMP: " + last.temp + " °C";
+
+            document.getElementById('hum').innerText =
+            "HUMIDITY: " + last.hum + " %";
+        }
+
+        updateChart(labels, temps);
+    });
+}
+
+function updateChart(labels, values) {
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    const ctx = document.getElementById('chart')
+    .getContext('2d');
+
+    chart = new Chart(ctx, {
+
+        type: 'line',
+
+        data: {
+
+            labels: labels,
+
+            datasets: [{
+                label: 'Temperature',
+                data: values,
+                borderWidth: 2
+            }]
+        }
+    });
+}
+
+setInterval(loadData, 3000);
+
+loadData();
+
+</script>
+
+</body>
+</html>
